@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fbf7ef">
+<title>LIFTO — مساعدك اليومي</title>
+<style>
+:root{
+ --red:#e74755;--red-dark:#c93445;--yellow:#f4c64e;--ink:#24232a;
+ --muted:#777681;--line:#e9e3d9;--surface:#fffdf9;--surface2:#f7f1e7;
+ --bg:#fbf7ef;--shadow:0 14px 36px rgba(49,35,28,.08);
+}
+html[data-theme="dark"]{
+ --red:#ff6673;--red-dark:#e94d5c;--yellow:#f5cb58;--ink:#f5f1eb;
+ --muted:#b6b0b0;--line:#393640;--surface:#24232b;--surface2:#302e38;
+ --bg:#19181f;--shadow:0 14px 36px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;transition:background .25s,color .25s;min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:22px 18px 42px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.brand{display:flex;align-items:center;gap:9px;font-size:25px;font-weight:900;letter-spacing:1px}
+.brandmark{width:35px;height:35px;border-radius:12px;background:var(--red);display:grid;place-items:center;color:white;box-shadow:0 5px 14px #e7475533}
+.brandmark svg{width:21px;height:21px}
+.brand span{color:var(--red)}
+.header-actions{display:flex;gap:8px;align-items:center}
+.icon-btn,.lang-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:13px;padding:9px 11px;cursor:pointer;font:inherit}
+.icon-btn{width:42px;height:42px;display:grid;place-items:center}
+.icon-btn svg{width:19px;height:19px}
+.lang-btn{font-size:12px;font-weight:700}
+.hero{text-align:center;margin:0 auto 24px;max-width:620px}
+.eyebrow{color:var(--red);font-size:12px;font-weight:800;letter-spacing:1px}
+h1{font-size:clamp(30px,7vw,46px);line-height:1.2;margin:10px 0 12px;letter-spacing:-1px}
+.sub{color:var(--muted);font-size:15px;line-height:1.9;margin:0}
+.capture{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:25px 20px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.capture:before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:5px;background:linear-gradient(90deg,var(--red),var(--yellow))}
+.camera{width:94px;height:94px;border-radius:29px;margin:7px auto 16px;background:var(--yellow);display:grid;place-items:center;color:#34291c;box-shadow:0 9px 22px #e7b83c33}
+.camera svg{width:42px;height:42px}
+.capture strong{display:block;font-size:19px}
+.capture small{display:block;color:var(--muted);margin-top:7px;line-height:1.6}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:450px;margin:20px auto 0}
+.action{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:15px;padding:13px 12px;font:inherit;font-weight:750;cursor:pointer;transition:transform .15s,filter .15s}
+.action:active{transform:scale(.98)}
+.action.primary{background:var(--red);border-color:var(--red);color:white;box-shadow:0 7px 17px #e747552b}
+.action svg{width:17px;height:17px;vertical-align:middle;margin-inline-end:6px}
+.preview{display:none;max-width:100%;max-height:220px;object-fit:contain;border-radius:15px;margin:15px auto 0}
+.section{margin-top:25px}
+.section h2{font-size:16px;margin:0 0 11px}
+textarea{width:100%;min-height:92px;resize:vertical;border:1px solid var(--line);border-radius:17px;background:var(--surface);color:var(--ink);padding:14px;font:inherit;outline:none}
+textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px #e7475517}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:30px;padding:9px 13px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--red)}
+.result{display:none;margin-top:22px;border:1px solid #d9c17a;background:color-mix(in srgb,var(--yellow) 13%,var(--surface));border-radius:18px;padding:17px}
+.result h3{margin:0 0 8px;color:var(--red)}
+.result p{margin:0;color:var(--ink);line-height:1.8}
+.history{margin-top:24px;padding:17px;border:1px solid var(--line);background:var(--surface);border-radius:18px}
+.history-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.history h2{font-size:15px;margin:0}
+.history-list{display:grid;gap:8px;margin-top:12px}
+.history-item{padding:10px 12px;background:var(--surface2);border-radius:12px;font-size:13px;color:var(--ink);display:flex;justify-content:space-between;gap:12px}
+.empty{font-size:12px;color:var(--muted);margin:12px 0 0}
+.note{font-size:12px;color:var(--muted);line-height:1.8;margin-top:20px}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:28px}
+.hidden{display:none!important}
+@media(min-width:600px){.wrap{padding-top:32px}.capture{padding:30px}.section{margin-top:30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="brand"><div class="brandmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h10"/><path d="m11 6 6 6-6 6"/><path d="M19 5v14"/></svg></div> LIFT<span>O</span></div>
+ <div class="header-actions">
+  <button class="icon-btn" id="themeBtn" aria-label="تغيير المظهر" title="تغيير المظهر"><svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <button class="lang-btn" id="langBtn">English</button>
+ </div>
+</header>
+<main>
+ <div class="hero">
+  <div class="eyebrow" id="eyebrow">مساعدك اليومي الذكي</div>
+  <h1 id="headline">صوّر. افهم. اتصرّف.</h1>
+  <p class="sub" id="subtitle">في حاجة مش فاهمها؟ وجّه الكاميرا أو اكتب سؤالك، وLIFTO يساعدك تفهمها خطوة بخطوة.</p>
+ </div>
+ <section class="capture">
+  <div class="camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="4"/></svg></div>
+  <strong id="captureTitle">إيه اللي محتاج تفهمه؟</strong>
+  <small id="captureHint">التقط صورة أو اختار صورة من جهازك</small>
+  <img id="preview" class="preview" alt="معاينة الصورة">
+  <div class="actions">
+   <button class="action primary" id="cameraBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="4"/></svg><span id="cameraText">افتح الكاميرا</span></button>
+   <button class="action" id="galleryBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg><span id="galleryText">اختر صورة</span></button>
+  </div>
+  <input id="cameraInput" class="hidden" type="file" accept="image/*" capture="environment">
+  <input id="galleryInput" class="hidden" type="file" accept="image/*">
+ </section>
+ <section class="section">
+  <h2 id="questionTitle">أو اكتب اللي محتاج مساعدة فيه</h2>
+  <textarea id="question" placeholder="مثلاً: إيه معنى العلامة دي على الغسالة؟"></textarea>
+  <div class="actions">
+   <button class="action" id="voiceBtn">🎙️ <span id="voiceText">اتكلم</span></button>
+   <button class="action primary" id="helpBtn"><span id="helpText">ساعدني</span> ←</button>
+  </div>
+ </section>
+ <section class="section">
+  <h2 id="popularTitle">اختصارات سريعة</h2>
+  <div class="quick">
+   <button class="chip" data-q="ترجم لي النص ده واشرحه ببساطة">◎ ترجمة وشرح</button>
+   <button class="chip" data-q="اشرح لي طريقة استخدام هذا الجهاز">⌘ فهم جهاز</button>
+   <button class="chip" data-q="لخّص لي محتوى هذه الفاتورة">▤ فهم فاتورة</button>
+   <button class="chip" data-q="حوّل الكلام ده إلى قائمة مهام">✓ تنظيم مهام</button>
+  </div>
+ </section>
+ <div class="result" id="result" aria-live="polite"><h3 id="resultTitle">LIFTO — نموذج تجريبي</h3><p id="resultText"></p></div>
+ <section class="history">
+  <div class="history-head"><h2 id="historyTitle">آخر استخداماتك</h2><button class="lang-btn" id="clearHistory">مسح السجل</button></div>
+  <div class="history-list" id="historyList"></div>
+  <p class="empty" id="emptyHistory">الأسئلة التي تحفظها هتظهر هنا على هذا الجهاز.</p>
+ </section>
+ <p class="note" id="disclaimer">دي نسخة واجهة تجريبية. اختيار الصور ومعاينتها وحفظ سجل الأسئلة يعمل محلياً، أما تحليل الصور والإجابات الذكية الحقيقية فسيتم تفعيله بعد ربط خدمة الذكاء الاصطناعي.</p>
+</main>
+<footer>LIFTO • Prototype 0.4 • Your everyday helper</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);let lang='ar';
+const cameraInput=$('cameraInput'),galleryInput=$('galleryInput');
+function showFile(file){if(!file)return;if(!file.type.startsWith('image/'))return alert(lang==='ar'?'اختار صورة من فضلك':'Please choose an image');$('preview').src=URL.createObjectURL(file);$('preview').style.display='block';$('captureHint').textContent=lang==='ar'?'الصورة جاهزة — اكتب سؤالك عنها':'Image ready — type your question';}
+$('cameraBtn').onclick=()=>cameraInput.click();$('galleryBtn').onclick=()=>galleryInput.click();
+cameraInput.onchange=e=>showFile(e.target.files[0]);galleryInput.onchange=e=>showFile(e.target.files[0]);
+function getHistory(){try{return JSON.parse(localStorage.getItem('lifto_history')||'[]')}catch(e){return[]}}
+function renderHistory(){let h=getHistory();$('historyList').innerHTML='';$('emptyHistory').style.display=h.length?'none':'block';h.slice(0,6).forEach(item=>{let d=document.createElement('div');d.className='history-item';let s=document.createElement('span');s.textContent=item.q;let t=document.createElement('small');t.textContent=item.date;d.append(s,t);$('historyList').append(d)})}
+$('helpBtn').onclick=()=>{let q=$('question').value.trim(),hasImage=$('preview').style.display==='block';if(!q&&!hasImage){$('result').style.display='block';$('resultText').textContent=lang==='ar'?'اكتب سؤالك أو اختار صورة الأول.':'Type a question or choose an image first.';return;}
+$('result').style.display='block';$('resultText').textContent=lang==='ar'?'استقبل LIFTO طلبك في النموذج التجريبي. تحليل الصور والإجابة الفعلية بالذكاء الاصطناعي هيتفعّلوا بعد توصيل الخدمة.':'LIFTO received your request in this prototype. Real AI image and text analysis will be enabled after connecting the AI service.';
+let h=getHistory();h.unshift({q:q||(lang==='ar'?'صورة تم اختيارها':'Image selected'),date:new Date().toLocaleDateString()});localStorage.setItem('lifto_history',JSON.stringify(h.slice(0,20)));renderHistory();};
+$('clearHistory').onclick=()=>{localStorage.removeItem('lifto_history');renderHistory()};
+document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('question').value=b.dataset.q;$('question').focus()});
+$('voiceBtn').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert(lang==='ar'?'الإملاء الصوتي غير مدعوم هنا. جرّب Chrome.':'Speech input is not supported here. Try Chrome.');const r=new SR();r.lang=lang==='ar'?'ar-EG':'en-US';r.onresult=e=>$('question').value=e.results[0][0].transcript;r.start()};
+$('themeBtn').onclick=()=>{let dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';$('themeIcon').innerHTML=dark?'<path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/>':'<path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42"/><circle cx="12" cy="12" r="4"/>';localStorage.setItem('lifto_theme',document.documentElement.dataset.theme)};
+let savedTheme=localStorage.getItem('lifto_theme');if(savedTheme)document.documentElement.dataset.theme=savedTheme;
+$('langBtn').onclick=()=>{lang=lang==='ar'?'en':'ar';document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';let ar=lang==='ar';
+const vals={eyebrow:ar?'مساعدك اليومي الذكي':'YOUR EVERYDAY AI ASSISTANT',headline:ar?'صوّر. افهم. اتصرّف.':'See it. Understand it. Do it.',subtitle:ar?'في حاجة مش فاهمها؟ وجّه الكاميرا أو اكتب سؤالك، وLIFTO يساعدك تفهمها خطوة بخطوة.':'Something confusing? Point your camera or type a question. LIFTO helps you understand it, step by step.',captureTitle:ar?'إيه اللي محتاج تفهمه؟':'What do you need to understand?',captureHint:ar?'التقط صورة أو اختار صورة من جهازك':'Take a photo or choose one from your device',cameraText:ar?'افتح الكاميرا':'Open camera',galleryText:ar?'اختر صورة':'Choose image',questionTitle:ar?'أو اكتب اللي محتاج مساعدة فيه':'Or type what you need help with',voiceText:ar?'اتكلم':'Speak',helpText:ar?'ساعدني':'Help me',popularTitle:ar?'اختصارات سريعة':'Quick shortcuts',historyTitle:ar?'آخر استخداماتك':'Recent activity',clearHistory:ar?'مسح السجل':'Clear history',emptyHistory:ar?'الأسئلة التي تحفظها هتظهر هنا على هذا الجهاز.':'Saved questions will appear here on this device.',disclaimer:ar?'دي نسخة واجهة تجريبية. اختيار الصور ومعاينتها وحفظ سجل الأسئلة يعمل محلياً، أما تحليل الصور والإجابات الذكية الحقيقية فسيتم تفعيله بعد ربط خدمة الذكاء الاصطناعي.':'This is an interface prototype. Image selection, preview and local history work. Real AI analysis will be enabled after connecting an AI service.'};
+Object.keys(vals).forEach(k=>$(k).textContent=vals[k]);$('langBtn').textContent=ar?'English':'العربية';$('question').placeholder=ar?'مثلاً: إيه معنى العلامة دي على الغسالة؟':'Example: What does this symbol on my washing machine mean?';};
+renderHistory();
+</script>
+</body></html>
