@@ -160,7 +160,7 @@ $('helpBtn').onclick=async()=>{
     renderHistory();
 
   }catch(error){
-    $('resultText').textContent='حصل خطأ في الاتصال. حاول مرة أخرى.';
+    $('resultText').textContent='تفاصيل الخطأ: '+error.message;
   }finally{
     btn.disabled=false;
   }
