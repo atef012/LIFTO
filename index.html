@@ -204,11 +204,31 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
   wrap.append(bubble,meta);
   if(role==='ai'){
    const tools=document.createElement('div'); tools.className='message-tools';
+   const speak=document.createElement('button'); speak.textContent=t('🔊 استمع','🔊 Listen');
+   speak.onclick=()=>speakAnswer(text,speak);
    const copy=document.createElement('button'); copy.textContent=t('نسخ الإجابة','Copy answer');
    copy.onclick=async()=>{try{await navigator.clipboard.writeText(text);toast(t('تم نسخ الإجابة','Answer copied'));}catch{toast(t('تعذر النسخ من المتصفح','Could not copy'));}};
-   tools.append(copy); wrap.append(tools);
+   tools.append(speak,copy); wrap.append(tools);
   }
   $('messages').append(wrap); $('messages').scrollTop=$('messages').scrollHeight;
+ }
+ let activeUtteranceButton = null;
+ function speakAnswer(text,button){
+  if(!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)){
+   toast(t('ميزة قراءة الإجابة غير مدعومة في هذا المتصفح.','Text-to-speech is not supported in this browser.'));return;
+  }
+  const synth=window.speechSynthesis;
+  if(synth.speaking && activeUtteranceButton===button){synth.cancel();button.textContent=t('🔊 استمع','🔊 Listen');activeUtteranceButton=null;return;}
+  synth.cancel();
+  if(activeUtteranceButton)activeUtteranceButton.textContent=t('🔊 استمع','🔊 Listen');
+  const utterance=new SpeechSynthesisUtterance(String(text||''));
+  utterance.lang=isAr()?'ar-EG':'en-US';utterance.rate=1;utterance.pitch=1;
+  const voices=synth.getVoices();
+  const preferred=voices.find(v=>v.lang.toLowerCase()===utterance.lang.toLowerCase()) || voices.find(v=>v.lang.toLowerCase().startsWith(isAr()?'ar':'en'));
+  if(preferred)utterance.voice=preferred;
+  activeUtteranceButton=button;button.textContent=t('⏹ إيقاف','⏹ Stop');
+  utterance.onend=utterance.onerror=()=>{if(activeUtteranceButton===button){button.textContent=t('🔊 استمع','🔊 Listen');activeUtteranceButton=null;}};
+  synth.speak(utterance);
  }
  function showTyping(){
   const el=document.createElement('div');el.id='typing';el.className='message ai';
@@ -257,6 +277,8 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
   return currentConversation();
  }
  async function send(){
+  if('speechSynthesis' in window)window.speechSynthesis.cancel();
+  if(activeUtteranceButton){activeUtteranceButton.textContent=t('🔊 استمع','🔊 Listen');activeUtteranceButton=null;}
   const q=$('question').value.trim(); if((!q&&!selectedImage)||busy)return;
   const imageToSend=selectedImage;
   const displayText=q || t('حلّل الصورة دي ووصفها لي.','Please analyze and describe this image.');
