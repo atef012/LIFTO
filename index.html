@@ -42,7 +42,7 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
 .sidebar{padding:14px;position:sticky;top:12px}
 .new-chat{width:100%;border:0;border-radius:14px;background:var(--red);color:#fff;padding:13px 14px;font-weight:900;box-shadow:0 8px 18px rgba(232,71,85,.2)}
 .side-title{font-size:12px;color:var(--muted);font-weight:850;margin:19px 5px 9px}
-.history-list{display:grid;gap:6px;max-height:340px;overflow:auto}
+.history-list{display:grid;gap:6px;max-height:340px;overflow:auto}.history-row{display:flex;align-items:center;gap:4px}.history-row .history-item{flex:1;min-width:0}.history-action{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:8px 7px;font-size:11px;cursor:pointer}.history-action:hover{background:var(--surface-2);color:var(--ink)}
 .history-item{display:flex;align-items:center;gap:8px;width:100%;border:1px solid transparent;background:transparent;color:var(--ink);padding:10px;border-radius:12px;text-align:start;font-size:12px}
 .history-item.active,.history-item:hover{background:var(--surface-2);border-color:var(--line)}
 .history-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
@@ -184,10 +184,14 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
   const list=$('historyList'); list.replaceChildren();
   $('historyEmpty').style.display=conversations.length?'none':'block';
   conversations.slice().sort((a,b)=>b.updated-a.updated).forEach(c=>{
+   const row=document.createElement('div'); row.className='history-row';
    const b=document.createElement('button'); b.className='history-item'+(c.id===currentId?' active':'');
    const icon=document.createElement('span'); icon.textContent='◷';
    const title=document.createElement('span'); title.textContent=c.title||t('محادثة جديدة','New chat');
-   b.append(icon,title); b.onclick=()=>openConversation(c.id); list.append(b);
+   b.append(icon,title); b.onclick=()=>openConversation(c.id);
+   const exportBtn=document.createElement('button'); exportBtn.className='history-action'; exportBtn.type='button'; exportBtn.title=t('تصدير المحادثة','Export chat'); exportBtn.textContent='↓'; exportBtn.onclick=()=>exportConversation(c.id);
+   const deleteBtn=document.createElement('button'); deleteBtn.className='history-action'; deleteBtn.type='button'; deleteBtn.title=t('حذف المحادثة','Delete chat'); deleteBtn.textContent='×'; deleteBtn.onclick=()=>deleteConversation(c.id);
+   row.append(b,exportBtn,deleteBtn); list.append(row);
   });
  }
  function addBubble(role,text,imageUrl=null){
@@ -224,6 +228,27 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
   if(!c.messages.length){$('messages').append($('welcomeTemplate').content.cloneNode(true));bindSuggestions();}
   else c.messages.forEach(m=>addBubble(m.role,m.text));
   renderHistory();
+ }
+ function exportConversation(id){
+  const c=conversations.find(x=>x.id===id); if(!c)return;
+  const lines=[c.title||t('محادثة جديدة','New chat'),'—'];
+  (c.messages||[]).forEach(m=>{lines.push((m.role==='user'?t('أنت:','You:'):'LIFTO:'));lines.push(m.text||'','');});
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;
+  a.download='LIFTO-chat-'+new Date(c.updated||Date.now()).toISOString().slice(0,10)+'.txt';
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast(t('تم تجهيز ملف المحادثة','Chat export started'));
+ }
+ function deleteConversation(id){
+  const c=conversations.find(x=>x.id===id);if(!c)return;
+  if(!confirm(t('تحذف المحادثة دي فقط؟','Delete only this conversation?')))return;
+  conversations=conversations.filter(x=>x.id!==id);saveConversations();
+  if(currentId===id){
+   currentId=null;
+   if(conversations.length)openConversation(conversations.slice().sort((a,b)=>b.updated-a.updated)[0].id);
+   else{$('messages').replaceChildren($('welcomeTemplate').content.cloneNode(true));bindSuggestions();}
+  }
+  renderHistory();toast(t('تم حذف المحادثة','Conversation deleted'));
  }
  function ensureConversation(){
   if(!currentConversation()){
