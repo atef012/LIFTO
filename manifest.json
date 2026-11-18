@@ -4,9 +4,9 @@
   "display": "standalone",
   "name": "LIFTO",
   "orientation": "any",
-  "scope": "/",
+  "scope": "/LIFTO/",
   "short_name": "LIFTO",
-  "start_url": "/",
+  "start_url": "/LIFTO/",
   "theme_color": "#e63532",
   "id": "https://atef012.github.io/LIFTO/",
   "description": "LIFTO - Your smart daily AI assistant"
