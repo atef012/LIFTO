@@ -129,10 +129,43 @@ $('cameraBtn').onclick=()=>cameraInput.click();$('galleryBtn').onclick=()=>galle
 cameraInput.onchange=e=>showFile(e.target.files[0]);galleryInput.onchange=e=>showFile(e.target.files[0]);
 function getHistory(){try{return JSON.parse(localStorage.getItem('lifto_history')||'[]')}catch(e){return[]}}
 function renderHistory(){let h=getHistory();$('historyList').innerHTML='';$('emptyHistory').style.display=h.length?'none':'block';h.slice(0,6).forEach(item=>{let d=document.createElement('div');d.className='history-item';let s=document.createElement('span');s.textContent=item.q;let t=document.createElement('small');t.textContent=item.date;d.append(s,t);$('historyList').append(d)})}
-$('helpBtn').onclick=()=>{let q=$('question').value.trim(),hasImage=$('preview').style.display==='block';if(!q&&!hasImage){$('result').style.display='block';$('resultText').textContent=lang==='ar'?'اكتب سؤالك أو اختار صورة الأول.':'Type a question or choose an image first.';return;}
-$('result').style.display='block';$('resultText').textContent=lang==='ar'?'استقبل LIFTO طلبك في النموذج التجريبي. تحليل الصور والإجابة الفعلية بالذكاء الاصطناعي هيتفعّلوا بعد توصيل الخدمة.':'LIFTO received your request in this prototype. Real AI image and text analysis will be enabled after connecting the AI service.';
-let h=getHistory();h.unshift({q:q||(lang==='ar'?'صورة تم اختيارها':'Image selected'),date:new Date().toLocaleDateString()});localStorage.setItem('lifto_history',JSON.stringify(h.slice(0,20)));renderHistory();};
-$('clearHistory').onclick=()=>{localStorage.removeItem('lifto_history');renderHistory()};
+
+$('helpBtn').onclick=async()=>{
+  let q=$('question').value.trim();
+  if(!q){
+    $('result').style.display='block';
+    $('resultText').textContent=lang==='ar'?'اكتب سؤالك الأول.':'Please type your question first.';
+    return;
+  }
+
+  const btn=$('helpBtn');
+  btn.disabled=true;
+  $('result').style.display='block';
+  $('resultText').textContent=lang==='ar'?'جاري التفكير...':'Thinking...';
+
+  try{
+    const response=await fetch('https://lifto-ai.atefzein20.workers.dev/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:q})
+    });
+
+    const data=await response.json();
+    if(!response.ok) throw new Error(data.details||data.error||'Request failed');
+
+    $('resultText').textContent=data.answer||'لم تصل إجابة.';
+    let h=getHistory();
+    h.unshift({q:q,date:new Date().toLocaleDateString()});
+    localStorage.setItem('lifto_history',JSON.stringify(h.slice(0,20)));
+    renderHistory();
+
+  }catch(error){
+    $('resultText').textContent='حصل خطأ في الاتصال. حاول مرة أخرى.';
+  }finally{
+    btn.disabled=false;
+  }
+};
+
 document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('question').value=b.dataset.q;$('question').focus()});
 $('voiceBtn').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert(lang==='ar'?'الإملاء الصوتي غير مدعوم هنا. جرّب Chrome.':'Speech input is not supported here. Try Chrome.');const r=new SR();r.lang=lang==='ar'?'ar-EG':'en-US';r.onresult=e=>$('question').value=e.results[0][0].transcript;r.start()};
 $('themeBtn').onclick=()=>{let dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';$('themeIcon').innerHTML=dark?'<path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/>':'<path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42"/><circle cx="12" cy="12" r="4"/>';localStorage.setItem('lifto_theme',document.documentElement.dataset.theme)};
