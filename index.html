@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#fff8ed">
 <meta name="description" content="LIFTO — مساعدك الذكي اليومي">
 <title>LIFTO — مساعدك اليومي</title>
+<meta name="application-name" content="LIFTO">
 <style>
 :root{
  --bg:#fff8ed;--surface:#ffffff;--surface-2:#fff1d8;--ink:#25232b;--muted:#77727d;
@@ -66,7 +67,7 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
 .ai .bubble{background:var(--surface-2);border:1px solid var(--line);border-bottom-left-radius:5px}
 .message-meta{font-size:10px;color:var(--muted);padding:0 5px}
 .message-tools{display:flex;gap:6px;justify-content:flex-end}
-.message-tools button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:5px 8px;font-size:10px}
+.message-tools button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:6px 9px;font-size:10px}
 .typing{display:flex;gap:5px;align-items:center;padding:14px 16px;background:var(--surface-2);border:1px solid var(--line);border-radius:17px;width:max-content}
 .typing i{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:blink 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
 .composer-wrap{padding:14px 16px 16px;border-top:1px solid var(--line);background:var(--surface)}
@@ -179,6 +180,13 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
  }
  function currentConversation(){ return conversations.find(c=>c.id===currentId); }
  function escapeText(s){ return String(s ?? ''); }
+ async function copyText(value){
+  const text=String(value??'');
+  if(navigator.clipboard && window.isSecureContext){await navigator.clipboard.writeText(text);return;}
+  const area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');
+  area.style.position='fixed';area.style.opacity='0';document.body.append(area);area.select();
+  const ok=document.execCommand('copy');area.remove();if(!ok)throw new Error('Copy failed');
+ }
 
  function renderHistory(){
   const list=$('historyList'); list.replaceChildren();
@@ -206,9 +214,16 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.18;margin:12px 0 9px;letter-spac
    const tools=document.createElement('div'); tools.className='message-tools';
    const speak=document.createElement('button'); speak.textContent=t('🔊 استمع','🔊 Listen');
    speak.onclick=()=>speakAnswer(text,speak);
-   const copy=document.createElement('button'); copy.textContent=t('نسخ الإجابة','Copy answer');
-   copy.onclick=async()=>{try{await navigator.clipboard.writeText(text);toast(t('تم نسخ الإجابة','Answer copied'));}catch{toast(t('تعذر النسخ من المتصفح','Could not copy'));}};
-   tools.append(speak,copy); wrap.append(tools);
+   const copy=document.createElement('button'); copy.textContent=t('📋 نسخ','📋 Copy');
+   copy.onclick=async()=>{try{await copyText(text);toast(t('تم نسخ الإجابة','Answer copied'));}catch{toast(t('تعذر النسخ من المتصفح','Could not copy'));}};
+   const share=document.createElement('button'); share.textContent=t('↗ مشاركة','↗ Share');
+   share.onclick=async()=>{
+    try{
+     if(navigator.share){await navigator.share({title:'LIFTO',text:String(text||'')});}
+     else{await copyText(text);toast(t('المشاركة غير متاحة؛ تم نسخ الإجابة','Sharing unavailable; answer copied'));}
+    }catch(err){if(err && err.name!=='AbortError')toast(t('تعذرت المشاركة؛ جرّب النسخ','Could not share; try copying'));}
+   };
+   tools.append(speak,copy,share); wrap.append(tools);
   }
   $('messages').append(wrap); $('messages').scrollTop=$('messages').scrollHeight;
  }
